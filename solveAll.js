@@ -1,10 +1,10 @@
 
 const ASSIGNED_LOCALITY = "aundh"; 
 
-const REFERENCE_TIME = "2026-09-14T23:59:00+05:30"; 
+const REFERENCE_TIME = "2026-09-10T00:00:00+05:30"; 
 
 const API_KEY = "IVY26-0DD40C14CD1F";
-const TOKEN = "eyJleHAiOjE3ODkzOTY1MzYsImlhdCI6MTc4OTM5NTYzNiwia2V5IjoiSVZZMjYtMERENDBDMTRDRDFGIiwic3ViIjoiZGVtbzFAaXZ5LmhvbWVzIiwidHlwIjoiYWNjZXNzIn0.8dykAQWA4I3q2eVD9W9BP9Ux-GJu0CGfJiiMkPtomAU";
+const TOKEN = "eyJleHAiOjE3ODk0MDE3MDAsImlhdCI6MTc4OTQwMDgwMCwia2V5IjoiSVZZMjYtMERENDBDMTRDRDFGIiwic3ViIjoiZGVtbzFAaXZ5LmhvbWVzIiwidHlwIjoiYWNjZXNzIn0.b1E6JewUPaUIrAeCF_XCR5y06Z5dcApS2KNg-_hIcCs";
 
 
 async function fetchEndpoint(endpoint) {
@@ -136,7 +136,7 @@ async function getAnswers() {
     console.log("8. Listings Last 7 Days:", listings_last_7_days);
     console.log("9. Fake Listing IDs:", fakeListingIds);
     console.log("10. Projects Wrong Count:", projects_with_wrong_listing_count);
-    console.log(myRentals[0].locality)
+    // console.log(myRentals[0].locality)
     console.log("\n===================================");
 }
 

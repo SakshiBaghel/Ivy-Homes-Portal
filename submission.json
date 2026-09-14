@@ -7,7 +7,7 @@
     "demo_url": ""
   },
   "answers": {
-    "total_listing_records": 3550  (by running in the manually every record) || 3531(by Postman result),
+    "total_listing_records": 3550  (by running manually every record) || 3531(by Postman result),
     "unique_properties": 3465,
     "active_listings": 2808,
     "corrupt_listing_ids": [
@@ -22,7 +22,7 @@
     "total_monthly_rent (Locality)": 0,
     "avg_price_per_sqft_2bhk": 18313.03,
     "costliest_project": { "project_id": "P30175", "price_max_inr": 28200000 },
-    "listings_last_7_days": 42,
+    "listings_last_7_days": 117,
     "fake_listing_ids": [
                           '100-3000108',
                           '100-3000749',
