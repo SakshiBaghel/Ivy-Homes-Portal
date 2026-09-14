@@ -125,5 +125,5 @@ Never commit API credentials to the repository. Keep them in `.env` and add the 
 .env.local
 ```
 
-## Demo
+## Demo video and link
 https://drive.google.com/drive/folders/12HZ6vfVO7igW9ODoAnYAqXYiBvsuyw9A?usp=drive_link
