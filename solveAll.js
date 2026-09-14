@@ -1,16 +1,6 @@
-// ⚠️ DHYAN DEIN: Yahan apni email se dekh kar values daalni hain!
-// const ASSIGNED_LOCALITY = "wakad"; // Email me jo locality di hai wo yahan likho (lowercase me)
-// const REFERENCE_TIME = "2026-09-01T00:00:00+05:30"; // Email me jo REFERENCE time hai wo exact yahan likho
 
-// const API_KEY = "IVY26-0DD40C14CD1F";
-// const TOKEN = "eyJleHAiOjE3ODkzOTQxMTYsImlhdCI6MTc4OTM5MzIxNiwia2V5IjoiSVZZMjYtMERENDBDMTRDRDFGIiwic3ViIjoiZGVtbzFAaXZ5LmhvbWVzIiwidHlwIjoiYWNjZXNzIn0.phQ8gxv3msbNx0waQ9xqXW4aavIy1spZzmK8LPnh7Ko";
-
-
-// Email se mili details
 const ASSIGNED_LOCALITY = "aundh"; 
 
-// NOTE: Email me REFERENCE time alag se nahi likha h, toh 99% chance h ki wo deadline time (14 Sept 2026, 23:59) hi hai. 
-// Agar tumhare 'statement.md' file me REFERENCE time kuch aur diya h, toh usko yahan update kar lena.
 const REFERENCE_TIME = "2026-09-14T23:59:00+05:30"; 
 
 const API_KEY = "IVY26-0DD40C14CD1F";
@@ -44,7 +34,6 @@ async function fetchEndpoint(endpoint) {
         }
     }
     
-    // Duplicates hata rahe hain
     return Array.from(new Map(allData.map(item => [item.listing_id || item.rental_id || item.project_id || item.id, item])).values());
 }
 
@@ -54,9 +43,6 @@ async function getAnswers() {
     const uniqueRentals = await fetchEndpoint("rentals");
     const uniqueProjects = await fetchEndpoint("projects");
 
-    // ==========================================
-    // PURANE ANSWERS (1 TO 4)
-    // ==========================================
     const totalRecords = uniqueListings.length;
     
     const uniqueSet = new Set(uniqueListings.map(i => `${i.latitude}-${i.longitude}-${i.bhk !== undefined ? i.bhk : i.bedroom}`));
@@ -67,9 +53,6 @@ async function getAnswers() {
     const corruptData = uniqueListings.filter(i => (i.floor > i.total_floors) || (i.carpet_area > i.super_builtup_area) || (i.price < 0 || i.carpet_area < 0));
     const corruptListingIds = corruptData.map(i => i.listing_id || i.id).sort();
 
-    // ==========================================
-    // NAYE ANSWERS (5 TO 10)
-    // ==========================================
 
     // 5. Total monthly rent in assigned locality
     const myRentals = uniqueRentals.filter(r => (r.locality || "").toLowerCase() === ASSIGNED_LOCALITY.toLowerCase());
