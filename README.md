@@ -1,110 +1,126 @@
-# Ivy-Homes-Portal
+# Ivy Homes Portal
 
-Real Estate Dashboard (Pune Market Explorer)
-A high-performance React application built to explore, filter, audit, and visualize real estate datasets for Pune. This dashboard bridges critical official API documentation gaps with robust client-side fallback handling, data validation layers, and dynamic charting analytics.
+### Pune Real Estate Market Explorer
 
-🚀 How to Run It
-1. Prerequisites
-Ensure you have Node.js (v18+) and npm installed on your system.
+A React-based real estate dashboard for exploring, filtering, auditing, and visualizing Pune property data. The application includes client-side validation and fallback handling for inconsistencies between the API documentation and the actual running service.
 
-2. Environment Setup
-Create a .env file in the root directory of the project to configure your environment variables:
+## 🚀 Getting Started
 
-Code snippet
-VITE_API_BASE_URL=https://solve.ivy.homes/v1/
-VITE_API_KEY=IVY26-0DD40C14CD1F
-3. Installation & Execution
-Open your terminal and run the following commands:
+### Prerequisites
+- Node.js 18+
+- npm
 
-Bash
-# Clone the repository
+### Setup
+
+```bash
 git clone <repository-url>
-cd real-estate-dashboard
-
-# Install dependencies
+cd Ivy-Homes-Portal
 npm install
+```
 
-# Start the local development server
+Create a `.env` file:
+
+```env
+VITE_API_BASE_URL=https://solve.ivy.homes/v1/
+VITE_API_KEY=YOUR_API_KEY
+```
+
+Run the application:
+
+```bash
 npm run dev
-Open your browser and navigate to http://localhost:5173.
+```
 
-🔍 How We Worked Out What to Distrust in the Docs (And What We Did About It)
-Relying blindly on the official API documentation caused immediate integration failures. Through systematic endpoint testing, Postman validation, and raw payload inspection, we uncovered and handled several major discrepancies:
+Open `http://localhost:5173`.
 
-Authentication Header Requirement:
+---
 
-Doc Claim: Append the API key as a query parameter (?api_key=...).
+## 🔍 API Findings & Handling
 
-Reality: Requests failed with missing X-API-Key header.
+Testing the API through Postman and raw payload inspection revealed several differences from the documentation:
 
-Action Taken: Configured the global API wrapper to pass authentication keys strictly via HTTP headers (X-API-Key and Authorization: Bearer).
+### Authentication
+- **Docs:** API key as a query parameter.
+- **Actual:** Requests require `X-API-Key` and Bearer authentication headers.
+- **Handled by:** Centralized API wrapper.
 
-Token Expiry & Undocumented Refresh Flow:
+### Token Expiry
+- **Docs:** Tokens valid for 24 hours with no refresh flow.
+- **Actual:** Access tokens expire after 15 minutes and return `401`.
+- **Handled by:** Refresh flow using the undocumented `/auth/refresh` endpoint.
 
-Doc Claim: Tokens remain valid for 24 hours with no refresh mechanism.
+### Pagination
+- **Docs:** `page` and `page_size`.
+- **Actual:** `limit`, `offset`, `total`, and `has_more`.
+- **Handled by:** Custom offset-based pagination loader, allowing retrieval of 3,500+ records.
 
-Reality: Access tokens expire in 15 minutes (900 seconds), throwing 401 errors pointing to an undocumented POST /auth/refresh endpoint.
+### Incorrect Endpoints
+- `/v1/listing/{id}` → `/v1/listings/{id}`
+- `/v1/favourites` → `/v1/saved`
+- Saved listings require `listing_id` instead of `id`.
 
-Action Taken: Stored both access and refresh tokens securely and implemented a token handling fallback flow.
+### Filtering & Data Validation
+Server-side furnishing filters were unreliable, and inactive listings (`is_live: false`) could still be returned.
 
-Pagination Structure Mismatch:
+The application therefore applies important filters and validation **client-side**, including explicit `is_live === true` checks.
 
-Doc Claim: Page-based pagination (page and page_size).
+### Pricing
+Project pricing fields were returned in inconsistent units:
+- `price_min` → Lakhs
+- `price_max` → Crores
 
-Reality: Server uses offset-based pagination (limit, offset, total, and has_more).
+Normalization logic was added before using these values in the UI and analytics.
 
-Action Taken: Built a custom loop pagination loader tracking offsets to successfully pull the entire 3,500+ record inventory without truncation.
+### Data Sanitization
+An unexpected prompt-injection-style string was found inside the amenities data of project `P30004`. API strings are therefore treated as untrusted input and sanitized before processing.
 
-Incorrect Endpoint Routes & Payloads:
+### Analytics
+`GET /v1/analytics/summary` returned `404`.
 
-/v1/listing/{id} (singular) returned 404 Not Found; corrected to plural /v1/listings/{id}.
+Required analytics such as median prices and locality/BHK breakdowns are calculated client-side from the aggregated dataset.
 
-/v1/favourites returned 404 Not Found; corrected to /v1/saved requiring the payload key listing_id instead of id.
+### Rate Limiting
+Bulk requests triggered `429 Too Many Requests`.
 
-Ignored Server-Side Filters & Completeness:
+The application uses controlled batching and request pacing to avoid excessive API traffic.
 
-Passing furnishing query parameters was silently ignored by the server. Furthermore, inactive records (is_live: false) were returned despite documentation claims of server-side exclusion.
+---
 
-Action Taken: Implemented robust client-side filter handlers and enforced explicit checks for is_live === true.
+## ✅ Additional API Checks
 
-Project Pricing Units & Adversarial Prompt Injections:
+The following were tested and found to work correctly:
 
-price_min was returned in Lakhs (float) and price_max in Crores (float) instead of raw integer rupees. Additionally, a hidden adversarial prompt injection string was discovered embedded in project P30004's amenities list.
+- Standard Bearer token authentication
+- `project_id` relationships between listings and projects
+- Case-insensitive locality matching
 
-Action Taken: Added normalization wrappers for project pricing logic and sanitized strings to bypass adversarial evaluation traps.
+---
 
-Missing Analytics Summary Endpoint:
+## 📈 Future Improvements
 
-GET /v1/analytics/summary returned 404 Not Found.
+Given two additional days, I would focus on:
 
-Action Taken: Computed all metrics (medians, breakdowns by locality and BHK) dynamically client-side from the aggregated raw dataset.
+- Request queue with exponential backoff for `429` responses
+- IndexedDB / TanStack Query caching
+- Interactive property map using Leaflet or Mapbox
+- Jest and Playwright test coverage
 
-Rate Limiting & Throttling Under Heavy Load:
+---
 
-Reality: High-frequency parallel requests fetching thousands of items triggered HTTP 429 Too Many Requests errors.
+## 🛠️ Tech Stack
 
-Action Taken: Implemented controlled batching and offset pacing to keep network traffic compliant with server constraints.
+- React
+- Vite
+- JavaScript
+- REST APIs
+- Postman
+- Dynamic data visualization
 
-✅ What We Checked That Turned Out to be Fine (Hypotheses That Did Not Pan Out)
-Investigating false alarms provides key insights into system resilience. Several initial suspicions turned out to be completely accurate as documented:
+## 🔒 Security
 
-Standard Bearer Token Execution: We initially worried that custom header scopes might fail or reject standard JWT structures, but token verification worked cleanly across all endpoints.
+Never commit API credentials to the repository. Keep them in `.env` and add the file to `.gitignore`.
 
-Relational Foreign Key Consistency: We hypothesized that joining listings with parent builder projects via project_id might result in orphan references or broken mappings. Testing confirmed strong relational integrity.
-
-Locality Query Parameter Matching: We tested lowercase parameter passing (?locality=aundh) and verified that server-side text matching functioned reliably without case-sensitivity bugs.
-
-📈 What I Would Do With Another Two Days (Focus on Scalability & Rate Limiting)
-Given 48 additional hours, the architecture would be scaled and hardened with the following priorities:
-
-Client-Side Rate Limiting & Concurrency Queues:
-
-Implement a token-bucket algorithm or exponential backoff retry mechanism (utilizing libraries like p-limit) to gracefully handle HTTP 429 Too Many Requests responses during bulk synchronization.
-
-Add intelligent request batching and queuing to optimize network throughput under heavy multi-tab usage.
-
-Offline-First Caching Layer: Integrate IndexedDB or TanStack Query to cache fetched dataset chunks locally, reducing redundant network roundtrips and enabling instant page transitions.
-
-Interactive Map View: Embed Leaflet.js or Mapbox to plot property coordinates (latitude and longitude), allowing users to explore Pune properties geographically.
-
-Automated Testing Suite: Establish comprehensive unit and integration testing using Jest and Playwright to safeguard custom filters and data normalizers against regression.
+```gitignore
+.env
+.env.local
+```
